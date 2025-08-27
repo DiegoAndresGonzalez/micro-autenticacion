@@ -20,7 +20,6 @@ public class UserUseCase {
     }
 
     public Mono<Void> validateUserData(User user) {
-
         if (user == null || user.getName() == null || user.getName().isBlank() ||
                 user.getLastName() == null || user.getLastName().isBlank() ||
                 user.getBirthday() == null ||
@@ -49,17 +48,17 @@ public class UserUseCase {
 
     private Mono<Void> validateExistingEmail(String email) {
         return repository.findByEmail(email)
-                .flatMap(existingUser -> Mono.error(
-                        new EmailAlreadyExists(Constants.EMAIL_EXISTS)
-                ))
+                .handle((user, sink) -> sink.error
+                        (new EmailAlreadyExists(Constants.EMAIL_EXISTS)))
+                .switchIfEmpty(Mono.empty())
                 .then();
     }
 
     private Mono<Void> validateExistingDocument(String documentId) {
         return repository.findByDocumentId(documentId)
-                .flatMap(existingUser -> Mono.error(
-                        new DocumentAlreadyExists(Constants.DOCUMENT_EXISTS)
-                ))
+                .handle((user, sink) -> sink.error
+                        (new DocumentAlreadyExists(Constants.DOCUMENT_EXISTS)))
+                .switchIfEmpty(Mono.empty())
                 .then();
     }
 

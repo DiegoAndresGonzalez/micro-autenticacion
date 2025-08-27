@@ -27,6 +27,8 @@ public class Handler {
         return request.bodyToMono(CreateUserDto.class)
                 .map(userDtoMapper::toModel)
                 .flatMap(userUseCase::saveUser)
+                .doOnNext(user -> log.info(Constants.LOG_SUCCESSFUL_REQUEST))
+                .doOnError(user -> log.error(Constants.LOG_ERROR_HANDLER))
                 .flatMap(user -> ServerResponse.status(HttpStatus.CREATED)
                         .contentType(MediaType.APPLICATION_JSON)
                         .bodyValue(userDtoMapper.toResponse(user)));
