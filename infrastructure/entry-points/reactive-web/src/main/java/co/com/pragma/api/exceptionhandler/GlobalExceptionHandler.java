@@ -4,6 +4,7 @@ import co.com.pragma.api.utils.Constants;
 import co.com.pragma.usecase.user.exceptions.DocumentAlreadyExists;
 import co.com.pragma.usecase.user.exceptions.EmailAlreadyExists;
 import co.com.pragma.usecase.user.exceptions.InvalidDataException;
+import co.com.pragma.usecase.user.exceptions.UserNotFoundException;
 import org.springframework.boot.autoconfigure.web.WebProperties;
 import org.springframework.boot.autoconfigure.web.reactive.error.AbstractErrorWebExceptionHandler;
 import org.springframework.boot.web.reactive.error.ErrorAttributes;
@@ -32,7 +33,8 @@ public class GlobalExceptionHandler extends AbstractErrorWebExceptionHandler {
     private final Map<Class<? extends Throwable>, HttpStatus> exceptionToStatus = Map.of(
             InvalidDataException.class, HttpStatus.BAD_REQUEST,
             EmailAlreadyExists.class, HttpStatus.BAD_REQUEST,
-            DocumentAlreadyExists.class, HttpStatus.BAD_REQUEST
+            DocumentAlreadyExists.class, HttpStatus.BAD_REQUEST,
+            UserNotFoundException.class, HttpStatus.NOT_FOUND
     );
 
     private Mono<ServerResponse> renderErrorResponse(ServerRequest request) {

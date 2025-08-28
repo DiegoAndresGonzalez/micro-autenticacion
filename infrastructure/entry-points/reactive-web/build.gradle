@@ -10,4 +10,5 @@ dependencies {
     annotationProcessor "org.mapstruct:mapstruct-processor:$mapstructVersion"
     implementation 'org.springframework.data:spring-data-r2dbc'
     implementation 'io.r2dbc:r2dbc-spi'
+    implementation 'org.springdoc:springdoc-openapi-starter-webflux-ui:2.5.0'
 }

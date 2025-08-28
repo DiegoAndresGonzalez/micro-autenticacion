@@ -5,6 +5,7 @@ import co.com.pragma.model.user.gateways.UserRepository;
 import co.com.pragma.usecase.user.exceptions.DocumentAlreadyExists;
 import co.com.pragma.usecase.user.exceptions.EmailAlreadyExists;
 import co.com.pragma.usecase.user.exceptions.InvalidDataException;
+import co.com.pragma.usecase.user.exceptions.UserNotFoundException;
 import co.com.pragma.usecase.user.utils.Constants;
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
@@ -17,6 +18,15 @@ public class UserUseCase {
     public Mono<User> saveUser(User user) {
         return validateUserData(user)
                 .then(Mono.defer(() -> repository.save(user)));
+    }
+
+    public Mono<User> findUserByDocumentId(String documentId) {
+        if (!isValidDocument(documentId)) {
+            return Mono.error(new InvalidDataException(Constants.INVALID_USER_DATA));
+        }
+
+        return repository.findByDocumentId(documentId)
+                .switchIfEmpty(Mono.error(new UserNotFoundException(Constants.USER_NOT_FOUND)));
     }
 
     public Mono<Void> validateUserData(User user) {
