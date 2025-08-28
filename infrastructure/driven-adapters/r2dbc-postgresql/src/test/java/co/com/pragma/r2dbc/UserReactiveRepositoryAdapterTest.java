@@ -1,5 +1,7 @@
 package co.com.pragma.r2dbc;
 
+import co.com.pragma.model.user.User;
+import co.com.pragma.r2dbc.entity.UserEntity;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -26,52 +28,111 @@ class UserReactiveRepositoryAdapterTest {
     @Mock
     ObjectMapper mapper;
 
+    private User buildValidUser() {
+        return User.builder()
+                .id(1L)
+                .name("Diego")
+                .email("diego@test.com")
+                .build();
+    }
+
+    private UserEntity buildValidUserEntity(){
+        return UserEntity.builder()
+                .id(1L)
+                .name("Diego")
+                .email("diego@test.com")
+                .build();
+    }
+
     @Test
     void mustFindValueById() {
+        User user = buildValidUser();
+        UserEntity userEntity = buildValidUserEntity();
+        when(repository.findById(1L)).thenReturn(Mono.just(userEntity));
+        when(mapper.map(userEntity, User.class)).thenReturn(user);
 
-        when(repository.findById("1")).thenReturn(Mono.just("test"));
-        when(mapper.map("test", Object.class)).thenReturn("test");
-
-        Mono<Object> result = repositoryAdapter.findById("1");
+        Mono<User> result = repositoryAdapter.findById(1L);
 
         StepVerifier.create(result)
-                .expectNextMatches(value -> value.equals("test"))
+                .expectNextMatches(value -> value.getId().equals(1L))
                 .verifyComplete();
     }
 
     @Test
     void mustFindAllValues() {
-        when(repository.findAll()).thenReturn(Flux.just("test"));
-        when(mapper.map("test", Object.class)).thenReturn("test");
+        User user = buildValidUser();
+        UserEntity userEntity = buildValidUserEntity();
+        when(repository.findAll()).thenReturn(Flux.just(userEntity));
+        when(mapper.map(userEntity, User.class)).thenReturn(user);
 
-        Flux<Object> result = repositoryAdapter.findAll();
+        Flux<User> result = repositoryAdapter.findAll();
 
         StepVerifier.create(result)
-                .expectNextMatches(value -> value.equals("test"))
+                .expectNextMatches(value -> value.getEmail().equals("diego@test.com"))
                 .verifyComplete();
     }
 
     @Test
     void mustFindByExample() {
-        when(repository.findAll(any(Example.class))).thenReturn(Flux.just("test"));
-        when(mapper.map("test", Object.class)).thenReturn("test");
+        User user = buildValidUser();
+        UserEntity userEntity = buildValidUserEntity();
 
-        Flux<Object> result = repositoryAdapter.findByExample("test");
+        when(repository.findAll(any(Example.class))).thenReturn(Flux.just(userEntity));
+        when(mapper.map(user, UserEntity.class)).thenReturn(userEntity);
+        when(mapper.map(userEntity, User.class)).thenReturn(user);
+
+        Flux<User> result = repositoryAdapter.findByExample(user);
 
         StepVerifier.create(result)
-                .expectNextMatches(value -> value.equals("test"))
+                .expectNextMatches(value -> value.getName().equals("Diego"))
                 .verifyComplete();
     }
 
     @Test
     void mustSaveValue() {
-        when(repository.save("test")).thenReturn(Mono.just("test"));
-        when(mapper.map("test", Object.class)).thenReturn("test");
+        User user = User.builder().id(1L).name("Diego").email("diego@test.com").build();
+        UserEntity userEntity = UserEntity.builder().id(1L).name("Diego").email("diego@test.com").build();
 
-        Mono<Object> result = repositoryAdapter.save("test");
+        when(repository.save(userEntity)).thenReturn(Mono.just(userEntity));
+
+        when(mapper.map(user, UserEntity.class)).thenReturn(userEntity);
+        when(mapper.map(userEntity, User.class)).thenReturn(user);
+
+        Mono<User> result = repositoryAdapter.save(user);
 
         StepVerifier.create(result)
-                .expectNextMatches(value -> value.equals("test"))
+                .expectNextMatches(value -> value.getId().equals(1L))
                 .verifyComplete();
     }
+
+    @Test
+    void mustFindByEmail() {
+        User user = buildValidUser();
+        UserEntity userEntity = buildValidUserEntity();
+
+        when(repository.findByEmail("diego@test.com")).thenReturn(Mono.just(userEntity));
+        when(mapper.map(userEntity, User.class)).thenReturn(user);
+
+        Mono<User> result = repositoryAdapter.findByEmail("diego@test.com");
+
+        StepVerifier.create(result)
+                .expectNextMatches(value -> value.getEmail().equals("diego@test.com"))
+                .verifyComplete();
+    }
+
+    @Test
+    void mustFindByDocumentId() {
+        User user = buildValidUser();
+        UserEntity userEntity = buildValidUserEntity();
+
+        when(repository.findByDocumentId("123456")).thenReturn(Mono.just(userEntity));
+        when(mapper.map(userEntity, User.class)).thenReturn(user);
+
+        Mono<User> result = repositoryAdapter.findByDocumentId("123456");
+
+        StepVerifier.create(result)
+                .expectNextMatches(value -> value.getId().equals(1L))
+                .verifyComplete();
+    }
+
 }

@@ -15,6 +15,6 @@ public class Constants {
     public static final String INVALID_EMAIL_FORMAT = "El formato del correo electrónico no es válido.";
     public static final String SALARY_OUT_OF_RANGE = "El salario base no puede ser mayor a 15,000,000.";
     public static final double MAX_SALARY = 15000000;
-
     public static final Pattern DOCUMENT_PATTERN = Pattern.compile("^[1-9]\\d{5,9}$");
+    public static final String USER_NOT_FOUND = "El usuario ingresado no existe.";
 }

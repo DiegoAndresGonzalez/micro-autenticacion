@@ -1,60 +1,105 @@
 package co.com.pragma.api;
 
-import org.assertj.core.api.Assertions;
+import co.com.pragma.api.dto.CreateUserDto;
+import co.com.pragma.api.dto.UserDto;
+import co.com.pragma.api.mapper.UserDtoMapper;
+import co.com.pragma.model.user.User;
+import co.com.pragma.usecase.user.UserUseCase;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
+import org.mockito.Mockito;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.reactive.server.WebTestClient;
+import reactor.core.publisher.Mono;
 
-@ContextConfiguration(classes = {RouterRest.class, Handler.class})
-@WebFluxTest
+import java.time.LocalDate;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+
 class RouterRestTest {
 
-    @Autowired
+    private UserUseCase userUseCase;
+    private UserDtoMapper userDtoMapper;
     private WebTestClient webTestClient;
 
-    @Test
-    void testListenGETUseCase() {
-        webTestClient.get()
-                .uri("/api/usecase/path")
-                .accept(MediaType.APPLICATION_JSON)
-                .exchange()
-                .expectStatus().isOk()
-                .expectBody(String.class)
-                .value(userResponse -> {
-                            Assertions.assertThat(userResponse).isEmpty();
-                        }
-                );
+    private User buildUser() {
+        return User.builder()
+                .id(1L)
+                .name("Diego")
+                .lastName("Prueba")
+                .birthday(LocalDate.of(1995, 1, 1))
+                .address("Calle 123")
+                .email("correo@test.com")
+                .documentId("123456")
+                .phone("3001234567")
+                .roleId(2L)
+                .baseSalary(2000)
+                .build();
+    }
+
+    private CreateUserDto buildCreateUserDto() {
+        return new CreateUserDto(
+                "Diego",
+                "Prueba",
+                LocalDate.of(1995, 1, 1),
+                "Calle 123",
+                "correo@test.com",
+                "123456",
+                "3001234567",
+                2000
+        );
+    }
+
+    private UserDto buildUserDto() {
+        return new UserDto(
+                1L,
+                "Diego",
+                "correo@test.com",
+                LocalDate.of(1995, 1, 1),
+                "Calle 123",
+                "correo@test.com",
+                "123456",
+                "3001234567",
+                2L,
+                2000
+
+        );
+    }
+
+    @BeforeEach
+    void setUp() {
+
+        userUseCase = Mockito.mock(UserUseCase.class);
+        userDtoMapper = Mockito.mock(UserDtoMapper.class);
+
+        Handler handler = new Handler(userUseCase, userDtoMapper);
+
+        RouterRest routerRest = new RouterRest();
+        webTestClient = WebTestClient.bindToRouterFunction(routerRest.routerFunction(handler)).build();
     }
 
     @Test
-    void testListenGETOtherUseCase() {
-        webTestClient.get()
-                .uri("/api/otherusercase/path")
-                .accept(MediaType.APPLICATION_JSON)
-                .exchange()
-                .expectStatus().isOk()
-                .expectBody(String.class)
-                .value(userResponse -> {
-                            Assertions.assertThat(userResponse).isEmpty();
-                        }
-                );
-    }
+    void createUser_success() {
 
-    @Test
-    void testListenPOSTUseCase() {
+        User model = buildUser();
+        CreateUserDto requestDto = buildCreateUserDto();
+        UserDto responseDto = buildUserDto();
+
+        when(userDtoMapper.toModel(any(CreateUserDto.class))).thenReturn(model);
+        when(userUseCase.saveUser(any(User.class))).thenReturn(Mono.just(model));
+        when(userDtoMapper.toResponse(any(User.class))).thenReturn(responseDto);
+
         webTestClient.post()
-                .uri("/api/usecase/otherpath")
-                .accept(MediaType.APPLICATION_JSON)
-                .bodyValue("")
+                .uri("/api/v1/usuarios")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(requestDto)
                 .exchange()
-                .expectStatus().isOk()
-                .expectBody(String.class)
-                .value(userResponse -> {
-                            Assertions.assertThat(userResponse).isEmpty();
-                        }
-                );
+                .expectStatus().isCreated()
+                .expectHeader().contentType(MediaType.APPLICATION_JSON)
+                .expectBody()
+                .jsonPath("$.id").isEqualTo(1L)
+                .jsonPath("$.name").isEqualTo("Diego")
+                .jsonPath("$.email").isEqualTo("correo@test.com");
     }
 }

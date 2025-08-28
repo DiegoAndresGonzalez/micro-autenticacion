@@ -34,6 +34,19 @@ public class Handler {
                         .bodyValue(userDtoMapper.toResponse(user)));
     }
 
+    public Mono<ServerResponse> findByDocumentId(ServerRequest request) {
+        String documentId = request.pathVariable("documentId");
+        log.info(Constants.LOG_SEARCH_USER, documentId);
+        return userUseCase.findUserByDocumentId(documentId)
+                .flatMap(user -> ServerResponse.ok()
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .bodyValue(user))
+                .switchIfEmpty(ServerResponse.notFound().build())
+                .doOnError(e -> log.error(Constants.LOG_ERROR_HANDLER))
+                .doOnSuccess(s -> log.info(Constants.USER_FOUND, documentId));
+
+    }
+
 
 }
 
