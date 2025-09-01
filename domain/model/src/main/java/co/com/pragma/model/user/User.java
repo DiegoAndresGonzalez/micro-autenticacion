@@ -17,6 +17,7 @@ public class User {
     private LocalDate birthday;
     private String address;
     private String email;
+    private String password;
     private String documentId;
     private String phone;
     private Long roleId;

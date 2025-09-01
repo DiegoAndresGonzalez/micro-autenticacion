@@ -1,6 +1,6 @@
 package co.com.pragma.api;
 
-import co.com.pragma.api.dto.UserDto;
+import co.com.pragma.api.dto.UserResponseDto;
 import co.com.pragma.api.utils.Constants;
 import co.com.pragma.model.user.User;
 import io.swagger.v3.oas.annotations.Operation;
@@ -37,7 +37,7 @@ public class RouterRest {
                             description = "Registra un nuevo usuario en el sistema",
                             responses = {
                                     @ApiResponse(responseCode = "201", description = Constants.LOG_SUCCESSFUL_REQUEST,
-                                            content = @Content(schema = @Schema(implementation = UserDto.class))),
+                                            content = @Content(schema = @Schema(implementation = UserResponseDto.class))),
                                     @ApiResponse(responseCode = "400", description = Constants.LOG_ERROR_HANDLER)
                             }
                     )
@@ -68,7 +68,9 @@ public class RouterRest {
         return route(POST("/api/v1/usuarios")
                 .and(accept(MediaType.APPLICATION_JSON)), handler::createUser)
                 .andRoute(GET("/api/v1/usuarios/{documentId}")
-                        .and(accept(MediaType.APPLICATION_JSON)), handler::findByDocumentId);
+                        .and(accept(MediaType.APPLICATION_JSON)), handler::findByDocumentId)
+                .andRoute(POST("/api/v1/login")
+                        .and(accept(MediaType.APPLICATION_JSON)), handler::login);
     }
 
 }

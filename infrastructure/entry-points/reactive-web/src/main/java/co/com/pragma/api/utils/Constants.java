@@ -9,5 +9,6 @@ public class Constants {
     public static final String MESSAGE = "Mensaje";
     public static final String LOG_SEARCH_USER = "Buscando usuario con el documento: {}";
     public static final String USER_FOUND = "Usuario con el documento: {} encontrado";
+    public static final String ROLE_ID = "roleId";
 
 }
