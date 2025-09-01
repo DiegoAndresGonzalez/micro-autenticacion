@@ -1,5 +1,6 @@
 package co.com.pragma.usecase.user;
 
+import co.com.pragma.model.authuser.gateways.PasswordEncoderService;
 import co.com.pragma.model.user.User;
 import co.com.pragma.model.user.gateways.UserRepository;
 import co.com.pragma.usecase.user.exceptions.DocumentAlreadyExists;
@@ -14,10 +15,15 @@ import reactor.core.publisher.Mono;
 public class UserUseCase {
 
     private final UserRepository repository;
+    private final PasswordEncoderService encoder;
 
     public Mono<User> saveUser(User user) {
         return validateUserData(user)
-                .then(Mono.defer(() -> repository.save(user)));
+                .then(Mono.defer(()->{
+                    String encryptedPassword = encoder.encode(user.getPassword());
+                    user.setPassword(encryptedPassword);
+                    return repository.save(user);
+                }));
     }
 
     public Mono<User> findUserByDocumentId(String documentId) {

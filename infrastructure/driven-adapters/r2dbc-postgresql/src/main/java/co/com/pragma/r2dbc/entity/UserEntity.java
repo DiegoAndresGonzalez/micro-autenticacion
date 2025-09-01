@@ -22,6 +22,7 @@ public class UserEntity {
     private LocalDate birthday;
     private String address;
     private String email;
+    private String password;
     @Column("document_id")
     private String documentId;
     private String phone;

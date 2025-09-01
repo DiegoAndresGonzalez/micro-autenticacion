@@ -1,7 +1,7 @@
 package co.com.pragma.api;
 
 import co.com.pragma.api.dto.CreateUserDto;
-import co.com.pragma.api.dto.UserDto;
+import co.com.pragma.api.dto.UserResponseDto;
 import co.com.pragma.api.mapper.UserDtoMapper;
 import co.com.pragma.model.user.User;
 import co.com.pragma.usecase.user.UserUseCase;
@@ -51,8 +51,8 @@ class RouterRestTest {
         );
     }
 
-    private UserDto buildUserDto() {
-        return new UserDto(
+    private UserResponseDto buildUserDto() {
+        return new UserResponseDto(
                 1L,
                 "Diego",
                 "correo@test.com",
@@ -84,7 +84,7 @@ class RouterRestTest {
 
         User model = buildUser();
         CreateUserDto requestDto = buildCreateUserDto();
-        UserDto responseDto = buildUserDto();
+        UserResponseDto responseDto = buildUserDto();
 
         when(userDtoMapper.toModel(any(CreateUserDto.class))).thenReturn(model);
         when(userUseCase.saveUser(any(User.class))).thenReturn(Mono.just(model));

@@ -64,5 +64,4 @@ public abstract class ReactiveAdapterOperations<E, D, I, R extends ReactiveCrudR
         return repository.findAll()
                 .map(this::toEntity);
     }
-
 }
