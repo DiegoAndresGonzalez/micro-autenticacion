@@ -66,5 +66,31 @@ public class Handler {
                 );
     }
 
+    public Mono<ServerResponse> createAdvisor(ServerRequest request){
+        log.info(Constants.LOG_ACCOUNT_REQUEST);
+        return request.bodyToMono(CreateUserDto.class)
+                .map(userDtoMapper::toModel)
+                .flatMap(userUseCase::createAdvisor)
+                .doOnNext(user -> log.info(Constants.LOG_SUCCESSFUL_REQUEST))
+                .doOnError(user -> log.error(Constants.LOG_ERROR_HANDLER))
+                .flatMap(user -> ServerResponse.status(HttpStatus.CREATED)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .bodyValue(userDtoMapper.toResponse(user)));
+    }
+
+    public Mono<ServerResponse> findByEmail(ServerRequest request) {
+        String email = request.pathVariable("email");
+        log.info("Buscando usuario por email {}", email);
+
+        return userUseCase.findByEmail(email)
+                .flatMap(user -> ServerResponse.ok()
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .bodyValue(user))
+                .switchIfEmpty(ServerResponse.notFound().build())
+                .doOnError(e -> log.error(Constants.LOG_ERROR_HANDLER))
+                .doOnSuccess(s -> log.info("Usuario encontrado con email {}", email));
+    }
+
+
 }
 

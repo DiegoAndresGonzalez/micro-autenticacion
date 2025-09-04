@@ -78,5 +78,18 @@ public class UserUseCase {
                 .then();
     }
 
+    public Mono<User> createAdvisor(User user) {
+        return validateUserData(user)
+                .then(Mono.defer(() -> {
+                    String encryptedPassword = encoder.encode(user.getPassword());
+                    user.setPassword(encryptedPassword);
+                    user.setRoleId(Constants.ID_THREE);
+                    return repository.save(user);
+                }));
+    }
+
+    public Mono<User> findByEmail(String email){
+        return repository.findByEmail(email);
+    }
 
 }

@@ -12,6 +12,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.security.oauth2.jwt.BadJwtException;
 import org.springframework.web.reactive.function.server.*;
 import reactor.core.publisher.Mono;
 import java.util.Map;
@@ -34,7 +35,8 @@ public class GlobalExceptionHandler extends AbstractErrorWebExceptionHandler {
             InvalidDataException.class, HttpStatus.BAD_REQUEST,
             EmailAlreadyExists.class, HttpStatus.BAD_REQUEST,
             DocumentAlreadyExists.class, HttpStatus.BAD_REQUEST,
-            UserNotFoundException.class, HttpStatus.NOT_FOUND
+            UserNotFoundException.class, HttpStatus.NOT_FOUND,
+            BadJwtException.class, HttpStatus.BAD_REQUEST
     );
 
     private Mono<ServerResponse> renderErrorResponse(ServerRequest request) {

@@ -47,10 +47,12 @@ public class AuthorizationJwt implements WebFluxConfigurer {
         return http
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
                 .authorizeExchange(exchanges -> exchanges
+                        .pathMatchers(HttpMethod.GET, "/api/v1/usuarios/email/{email}").permitAll()
                         .pathMatchers("/api/v1/login").permitAll()
                         .pathMatchers("api/v1/usuarios/{documentId}").permitAll()
                         .pathMatchers(HttpMethod.POST, "/api/v1/usuarios").hasRole("ADMIN")
                         .pathMatchers(HttpMethod.POST, "/api/v1/solicitudes").hasRole("CLIENT")
+
                         .anyExchange().authenticated()
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2
@@ -78,7 +80,7 @@ public class AuthorizationJwt implements WebFluxConfigurer {
                 Jwt jwt = new Jwt(token, iat, exp, Map.of("alg","HS256"), claims);
                 return Mono.just(jwt);
             } catch (Exception e) {
-                return Mono.error(new BadJwtException("Token inválido"));
+                return Mono.error(new BadJwtException("Token invalido"));
             }
         };
     }

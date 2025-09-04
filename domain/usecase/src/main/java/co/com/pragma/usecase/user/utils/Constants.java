@@ -17,4 +17,5 @@ public class Constants {
     public static final double MAX_SALARY = 15000000;
     public static final Pattern DOCUMENT_PATTERN = Pattern.compile("^[1-9]\\d{5,9}$");
     public static final String USER_NOT_FOUND = "El usuario ingresado no existe.";
+    public static final Long ID_THREE = 3L;
 }
