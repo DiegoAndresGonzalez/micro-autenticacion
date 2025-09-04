@@ -36,7 +36,7 @@ public class AuthUseCase {
                                         "role", roleName
                                 );
                                 String token = tokenService.generate(claims, Duration.ofHours(1));
-                                return new AuthResponse(user, token, System.currentTimeMillis() + 3600000);
+                                return new AuthResponse(token, System.currentTimeMillis() + 3600000);
                             });
                 });
     }

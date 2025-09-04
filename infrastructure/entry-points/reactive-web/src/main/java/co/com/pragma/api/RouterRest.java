@@ -70,7 +70,9 @@ public class RouterRest {
                 .andRoute(GET("/api/v1/usuarios/{documentId}")
                         .and(accept(MediaType.APPLICATION_JSON)), handler::findByDocumentId)
                 .andRoute(POST("/api/v1/login")
-                        .and(accept(MediaType.APPLICATION_JSON)), handler::login);
+                        .and(accept(MediaType.APPLICATION_JSON)), handler::login)
+                .andRoute(POST("/api/v1/usuarios/asesor"),handler::createAdvisor)
+                .andRoute(GET("/api/v1/usuarios/email/{email}"), handler::findByEmail);
     }
 
 }
